@@ -2,9 +2,18 @@ import pandas as pd
 import argparse
 import requests
 import os
+import sys
 import concurrent.futures
 
+print("Starting the script...")
+
 DOWNLOAD_DIR = 'downloads'
+LOG_FILE = open('log.txt', 'w')
+
+# Redirect stdout and stderr
+print("All output will be logged to log.txt")
+sys.stdout = LOG_FILE
+sys.stderr = LOG_FILE
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Process an Excel file.")
@@ -66,7 +75,6 @@ def get_file_ext(response):
     if 'image' in content_type:
         return content_type.split('/')[-1]
     else:
-        print("Unsupported file type. Only images are supported.")
         return None
 
 def download_file(item):
@@ -76,8 +84,12 @@ def download_file(item):
     if response.status_code == 200:
         ext = get_file_ext(response)
         if ext is None:
+            print(f"Could not determine file extension for {url}. Skipping download.")
             return
         save_path = os.path.join(DOWNLOAD_DIR, f"{file_name}.{ext}")
+        if os.path.exists(save_path):
+            print(f"File {save_path} already exists. Randomizing name.")
+            save_path = os.path.join(DOWNLOAD_DIR, f"{file_name}_{os.urandom(4).hex()}.{ext}")
 
         with open(save_path, 'wb') as file:
             file.write(response.content)

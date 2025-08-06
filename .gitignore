@@ -1,4 +1,5 @@
 .env/
 downloads/
 .~lock.*
+log.txt
 
