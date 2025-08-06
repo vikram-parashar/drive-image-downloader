@@ -2,6 +2,7 @@ import pandas as pd
 import argparse
 import requests
 import os
+import concurrent.futures
 
 DOWNLOAD_DIR = 'downloads'
 
@@ -11,6 +12,7 @@ def parse_arguments():
     parser.add_argument('--sheet', type=str, default=None, help='Name of the sheet to read (optional)')
     parser.add_argument('--image-column',type=str, default=None, help='Name of the column to read')
     parser.add_argument('--filename-column',type=str, default=None, help='Name of the column to read')
+    parser.add_argument('--workers', type=int, default=5, help='Number of worker threads for downloading files')
 
     args = parser.parse_args()
 
@@ -67,7 +69,9 @@ def get_file_ext(response):
         print("Unsupported file type. Only images are supported.")
         return None
 
-def download_file(url,file_name):
+def download_file(item):
+    url = item['url']
+    file_name = item['file_name']
     response = requests.get(url)
     if response.status_code == 200:
         ext = get_file_ext(response)
@@ -90,6 +94,12 @@ if __name__ == "__main__":
     download_links= create_download_links(public_links)
 
     create_download_dir(DOWNLOAD_DIR)
-
+    
+    items = []
     for i in range(len(download_links)):
-        download_file(download_links[i], file_names[i])
+        items.append({
+            'url': download_links[i],
+            'file_name': file_names[i]
+        })
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        executor.map(download_file, items)
