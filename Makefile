@@ -1,2 +1,2 @@
 run:
-	@python main.py book.xlsx --column image
+	@python main.py book.xlsx --image-column image --filename-column name
