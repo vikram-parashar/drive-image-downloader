@@ -49,7 +49,7 @@ def get_column_data(file_path, sheet_name=None, column_name=None):
         raise ValueError(f"Error reading the Excel file: {e}")
 
 
-def create_download_links(public_links):
+def create_download_links(links):
     """
     public link:
     https://drive.google.com/file/d/163TBfAl7DvfG3EltKhmYLu3M9OIbRZnQ/view?usp=drive_link
@@ -59,8 +59,14 @@ def create_download_links(public_links):
     """
 
     download_links = []
-    for public_link in public_links:
-        id=public_link.split('/')[5]
+    for link in links:
+        if link.startswith('https://drive.google.com/file/d/'):
+            id=link.split('/')[5]
+        elif link.startswith('https://drive.google.com/uc?id='):
+            id = link.split('=')[1]
+        else:
+            print(f"Invalid public link format: {link}. Skipping.")
+            continue
         download_link = f"https://drive.usercontent.google.com/download?id={id}&export=download"
         download_links.append(download_link)
 
@@ -100,10 +106,10 @@ def download_file(item):
 if __name__ == "__main__":
     args = parse_arguments()
 
-    public_links = get_column_data(args.file, args.sheet, args.image_column)
+    links = get_column_data(args.file, args.sheet, args.image_column)
     file_names = get_column_data(args.file, args.sheet, args.filename_column)
 
-    download_links= create_download_links(public_links)
+    download_links= create_download_links(links)
 
     create_download_dir(DOWNLOAD_DIR)
     

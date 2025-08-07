@@ -16,14 +16,6 @@ This Python script allows you to download images from **Google Drive public link
 
 Ensure you have Python 3.7+ installed. Then install the required packages:
 
-```bash
-pip install -r requirements.txt
-``` 
-Or install manually:
-```bash
-pip install pandas openpyxl requests
-``` 
-
 ## 🛠 Setup
 ```bash
 # 1. Clone the repository
@@ -35,7 +27,6 @@ python3 -m venv .env
 
 # 3. Activate the virtual environment
 source .env/bin/activate
-
 # On Windows (PowerShell):
 .env\Scripts\Activate.ps1
 
